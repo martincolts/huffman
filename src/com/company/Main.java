@@ -8,7 +8,7 @@ public class Main {
 
 
         String stringToZip = "hola mama";
-        PriorityQueue<Node> characters = getChars(stringToZip);
+        List<Node> characters = getChars(stringToZip);
 
         System.out.println(characters);
         Node node = codeHufmann(characters);
@@ -50,8 +50,8 @@ public class Main {
 }
 
 
-    private static PriorityQueue<Node> getChars(String stringToZip) {
-        PriorityQueue<Node> nodes = new PriorityQueue<>();
+    private static List<Node> getChars(String stringToZip) {
+        List<Node> nodes = new ArrayList<>();
         for (int i = 0 ; i < stringToZip.length() ; i++){
             if (!contains(nodes,(stringToZip.charAt(i)))) {
                 Double charFrequency = getFrequency(stringToZip, i);
@@ -59,11 +59,11 @@ public class Main {
                 nodes.add(node);
             }
         }
-
+        Collections.sort(nodes);
         return nodes;
     }
 
-    private static boolean contains(PriorityQueue<Node> nodes, char charAt) {
+    private static boolean contains(List<Node> nodes, char charAt) {
         for (Node node : nodes){
             if (node.getCaracter() == charAt)
                 return true;
@@ -80,16 +80,16 @@ public class Main {
         return acum/stringToZip.length();
     }
 
-    private static Node codeHufmann (PriorityQueue<Node> list){
+    private static Node codeHufmann (List<Node> list){
         while (list.size() != 1){
-            Node node1 = list.poll();
-            Node node2 = list.poll();
+            Node node1 = list.get(0);
+            Node node2 = list.get(1);
             Node nodeFather = new Node('0', node1.getFrecuency()+node2.getFrecuency(), node1, node2 );
             list.add(nodeFather);
             list.remove(0); list.remove(0);
-
+            Collections.sort(list);
         }
-        return list.peek();
+        return list.get(0);
     }
 
 
@@ -149,19 +149,6 @@ public class Main {
             else if (this.frecuency < other.getFrecuency())
                 return -1;
             else return 0;
-        }
-    }
-
-    public static class NodeComparator implements Comparator<Node> {
-
-        @Override
-        public int compare(Node o1, Node o2) {
-            return o1.compareTo(o2);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return this.equals(obj);
         }
     }
 
