@@ -4,17 +4,14 @@ import java.util.*;
 
 public class Main {
 
-    public static List<String> list = new ArrayList();
-    public static String codeFinal = "";
-
     public static void main(String[] args) {
 
 
         String stringToZip = "hola mama";
-        List<Node> caracteres = getCaracters (stringToZip);
+        PriorityQueue<Node> characters = getChars(stringToZip);
 
-        System.out.println(caracteres);
-        Node node = codeHufmann(caracteres);
+        System.out.println(characters);
+        Node node = codeHufmann(characters);
         System.out.println(node);
 
         String code = generateCode (node, stringToZip);
@@ -27,51 +24,46 @@ public class Main {
         for (int i= 0 ; i < stringToZip.length(); i++){
             List<String> acum = new ArrayList<>();
             acum.add("");
-            code += getCode(stringToZip.charAt(i), node, acum)+" ";
+            code += getCode2(stringToZip.charAt(i), node, "")+" ";
             acum.clear();
             acum.add("");
         }
         return code;
     }
 
-    private static String getCode(char charAt, Node node, List<String> acum) {
+    private static String getCode2(char charAt, Node node, String s) {
         if (charAt == node.getCaracter()) {
-            for (String s : list) {
-                acum.add( acum.get(0)+ s);
-                acum.remove(0);
-            }
-            list = new ArrayList<>();
-            return acum.get(0);
+            return s;
         }
         if (node.getRightSon() != null) {
-            list.add("0");
-            getCode(charAt, node.getRightSon(), acum);
-            if (list != null && list.size() != 0)
-                list.remove(list.size()-1);
+            String val = getCode2(charAt, node.getRightSon(), s+"0");
+            if (val != null)
+                return val;
         }
         if (node.getLeftSon() != null) {
-            list.add("1");
-            getCode(charAt, node.getLeftSon(), acum);
-            if (list != null && list.size() != 0)
-                list.remove(list.size()-1);
-        }
-        return acum.get(0);
-    }
+            String val = getCode2(charAt, node.getLeftSon(), s + "1");
+            if (val != null)
+                return val;
 
-    private static List<Node> getCaracters(String stringToZip) {
-        List<Node> nodes = new ArrayList<>();
+        }
+        return null;
+}
+
+
+    private static PriorityQueue<Node> getChars(String stringToZip) {
+        PriorityQueue<Node> nodes = new PriorityQueue<>();
         for (int i = 0 ; i < stringToZip.length() ; i++){
-            if (!contiene(nodes,(stringToZip.charAt(i)))) {
-                Double charFrecuency = getFrecuency(stringToZip, i);
-                Node node = new Node(stringToZip.charAt(i), charFrecuency, null, null);
+            if (!contains(nodes,(stringToZip.charAt(i)))) {
+                Double charFrequency = getFrequency(stringToZip, i);
+                Node node = new Node(stringToZip.charAt(i), charFrequency, null, null);
                 nodes.add(node);
             }
         }
-        Collections.sort(nodes);
+
         return nodes;
     }
 
-    private static boolean contiene(List<Node> nodes, char charAt) {
+    private static boolean contains(PriorityQueue<Node> nodes, char charAt) {
         for (Node node : nodes){
             if (node.getCaracter() == charAt)
                 return true;
@@ -79,7 +71,7 @@ public class Main {
         return false;
     }
 
-    private static Double getFrecuency(String stringToZip, int i) {
+    private static Double getFrequency(String stringToZip, int i) {
         Double acum = 0d ;
         for (int j = 0 ; j < stringToZip.length(); j++){
             if (stringToZip.charAt(j) == stringToZip.charAt(i))
@@ -88,16 +80,16 @@ public class Main {
         return acum/stringToZip.length();
     }
 
-    private static Node codeHufmann (List<Node> list){
+    private static Node codeHufmann (PriorityQueue<Node> list){
         while (list.size() != 1){
-            Node node1 = list.get(0);
-            Node node2 = list.get(1);
+            Node node1 = list.poll();
+            Node node2 = list.poll();
             Node nodeFather = new Node('0', node1.getFrecuency()+node2.getFrecuency(), node1, node2 );
             list.add(nodeFather);
             list.remove(0); list.remove(0);
-            Collections.sort(list);
+
         }
-        return list.get(0);
+        return list.peek();
     }
 
 
@@ -157,6 +149,19 @@ public class Main {
             else if (this.frecuency < other.getFrecuency())
                 return -1;
             else return 0;
+        }
+    }
+
+    public static class NodeComparator implements Comparator<Node> {
+
+        @Override
+        public int compare(Node o1, Node o2) {
+            return o1.compareTo(o2);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return this.equals(obj);
         }
     }
 
